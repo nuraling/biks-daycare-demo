@@ -8,28 +8,38 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: #F5F0E8; min-height: 100vh; padding: 0; }
-    .header { background: #1B4332; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
-    .header-left { display: flex; align-items: center; gap: 12px; }
+    body { background: #F5F0E8; min-height: 100vh; min-height: 100dvh; padding: 0; }
+    .header { background: #1B4332; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .header-left { display: flex; align-items: center; gap: 10px; }
     .header-left a { color: white; text-decoration: none; font-size: 20px; }
-    .header-left h1 { color: white; font-size: 20px; font-weight: 700; }
-    .header-left span { color: #a8d5b5; font-size: 13px; }
-    #branch-filter { padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 13px; font-family: inherit; }
-    .tabs { display: flex; gap: 0; padding: 16px 24px 0; }
-    .tab-btn { padding: 10px 20px; border: none; background: #e0e0e0; cursor: pointer; font-size: 14px; font-weight: 500; font-family: inherit; border-radius: 8px 8px 0 0; color: #555; }
+    .header-left h1 { color: white; font-size: 18px; font-weight: 700; }
+    .header-left span { color: #a8d5b5; font-size: 12px; }
+    #branch-filter { padding: 6px 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 13px; font-family: inherit; max-width: 180px; }
+    .tabs { display: flex; gap: 0; padding: 12px 16px 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .tab-btn { padding: 8px 16px; border: none; background: #e0e0e0; cursor: pointer; font-size: 13px; font-weight: 500; font-family: inherit; border-radius: 8px 8px 0 0; color: #555; white-space: nowrap; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
     .tab-btn.active { background: white; color: #1B4332; font-weight: 600; }
-    .content { padding: 0 24px 24px; }
-    .summary { background: white; padding: 14px 20px; border-radius: 0 8px 0 0; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #555; }
+    .content { padding: 0 16px 16px; }
+    .summary { background: white; padding: 10px 14px; border-radius: 0 8px 0 0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #555; flex-wrap: wrap; gap: 4px; }
     .summary strong { color: #1B4332; }
-    .table-wrap { overflow-x: auto; border-radius: 0 0 12px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: white; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .table-wrap { overflow-x: auto; border-radius: 0 0 12px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: white; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
     thead tr { background: #1B4332; color: white; }
-    thead th { padding: 10px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    thead th { padding: 8px 10px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
     tbody tr:nth-child(even) { background: #F7FAF7; }
-    tbody td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+    tbody td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
     .new-row { animation: highlight 2.5s ease-out forwards; }
     @keyframes highlight { 0% { background-color: #FFFDE7; } 100% { background-color: transparent; } }
-    .empty-state { text-align: center; padding: 60px 20px; background: white; border-radius: 0 0 12px 12px; }
+    .empty-state { text-align: center; padding: 40px 16px; background: white; border-radius: 0 0 12px 12px; }
+
+    @media (min-width: 600px) {
+      .header { padding: 16px 24px; }
+      .tabs { padding: 16px 24px 0; }
+      .content { padding: 0 24px 24px; }
+      table { font-size: 13px; }
+      thead th { padding: 10px 14px; font-size: 11px; }
+      tbody td { padding: 10px 14px; }
+      .summary { font-size: 13px; padding: 14px 20px; }
+    }
   </style>
 </head>
 <body>
@@ -100,7 +110,6 @@
     const lastUpdate = document.getElementById('last-update');
     const tableContainer = document.getElementById('table-container');
 
-    // Tab switching
     document.querySelectorAll('.tab-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -187,7 +196,6 @@
       }
     }
 
-    // Initial load + polling
     poll();
     setInterval(poll, 8000);
     document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
