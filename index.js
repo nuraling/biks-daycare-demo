@@ -1,20 +1,18 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-const Anthropic = require('@anthropic-ai/sdk');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 const { appendRow, getRows } = require('./sheets');
 const parentAgent = require('./agents/parentAgent');
 const staffAgent = require('./agents/staffAgent');
 
 const app = express();
 
-if (!process.env.ANTHROPIC_API_KEY) {
-  console.error('WARNING: ANTHROPIC_API_KEY is not set!');
+if (!process.env.GEMINI_API_KEY) {
+  console.error('WARNING: GEMINI_API_KEY is not set!');
 }
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -43,16 +41,22 @@ function chatRoute(agent, agentType) {
   return async (req, res) => {
     try {
       const { messages, userMessage } = req.body;
-      const conversation = [...messages, { role: 'user', content: userMessage }];
 
-      const response = await anthropic.messages.create({
-        model: 'claude-haiku-4-5-20251001',
-        max_tokens: 1024,
-        system: agent.SYSTEM_PROMPT,
-        messages: conversation,
+      const model = genAI.getGenerativeModel({
+        model: 'gemini-2.0-flash',
+        systemInstruction: agent.SYSTEM_PROMPT,
       });
 
-      const rawText = response.content[0].text;
+      // Convert messages to Gemini format
+      const history = messages.map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content }],
+      }));
+
+      const chat = model.startChat({ history });
+      const result = await chat.sendMessage(userMessage);
+      const rawText = result.response.text();
+
       const saveData = extractSave(rawText);
 
       if (saveData) {
