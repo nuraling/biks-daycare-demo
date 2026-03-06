@@ -9,6 +9,7 @@ body {
 }
 #app { width:100%; max-width:480px; height:100vh; display:flex; flex-direction:column; background:white; }
 #chat-header { background:#1B4332; height:60px; padding:0 16px; display:flex; align-items:center; gap:12px; flex-shrink:0; }
+#back-btn { color:white; text-decoration:none; font-size:20px; display:flex; align-items:center; margin-right:4px; }
 #header-avatar { width:40px; height:40px; border-radius:50%; background:#2D6A4F; color:white; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; }
 #header-info { flex:1; }
 #header-name { color:white; font-size:15px; font-weight:600; }
