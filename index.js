@@ -7,7 +7,14 @@ const parentAgent = require('./agents/parentAgent');
 const staffAgent = require('./agents/staffAgent');
 
 const app = express();
-const anthropic = new Anthropic();
+
+if (!process.env.ANTHROPIC_API_KEY) {
+  console.error('WARNING: ANTHROPIC_API_KEY is not set!');
+}
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
@@ -56,7 +63,7 @@ function chatRoute(agent, agentType) {
 
       return res.json({ reply: rawText, saved: false });
     } catch (err) {
-      console.error(`Error in /api/chat/${agentType}:`, err);
+      console.error(`Error in /api/chat/${agentType}:`, err.message || err);
       return res.json({ reply: 'Koneksi bermasalah. Coba lagi ya kak.', saved: false, error: true });
     }
   };
