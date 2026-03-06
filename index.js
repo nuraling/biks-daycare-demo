@@ -46,7 +46,7 @@ function chatRoute(agent, agentType) {
       const { messages, userMessage } = req.body;
 
       const model = genAI.getGenerativeModel({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-2.5-flash',
         systemInstruction: agent.SYSTEM_PROMPT,
       });
 
