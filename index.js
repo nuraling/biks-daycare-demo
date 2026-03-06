@@ -40,6 +40,9 @@ const CONFIRMATION = {
 function chatRoute(agent, agentType) {
   return async (req, res) => {
     try {
+      console.log(`[${agentType}] Request received`);
+      console.log(`[${agentType}] GEMINI_API_KEY set:`, !!process.env.GEMINI_API_KEY);
+
       const { messages, userMessage } = req.body;
 
       const model = genAI.getGenerativeModel({
@@ -53,9 +56,11 @@ function chatRoute(agent, agentType) {
         parts: [{ text: m.content }],
       }));
 
+      console.log(`[${agentType}] Calling Gemini...`);
       const chat = model.startChat({ history });
       const result = await chat.sendMessage(userMessage);
       const rawText = result.response.text();
+      console.log(`[${agentType}] Gemini responded OK`);
 
       const saveData = extractSave(rawText);
 
@@ -67,7 +72,8 @@ function chatRoute(agent, agentType) {
 
       return res.json({ reply: rawText, saved: false });
     } catch (err) {
-      console.error(`Error in /api/chat/${agentType}:`, err.message || err);
+      console.error(`[${agentType}] ERROR:`, err.message);
+      console.error(`[${agentType}] FULL ERROR:`, JSON.stringify(err, null, 2));
       return res.json({ reply: 'Koneksi bermasalah. Coba lagi ya kak.', saved: false, error: true });
     }
   };
