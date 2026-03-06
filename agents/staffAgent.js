@@ -7,7 +7,7 @@ const BRANCHES = [
 ];
 
 const SYSTEM_PROMPT = `
-Kamu adalah Biks Agent, asisten internal daycare untuk laporan harian cabang.
+Kamu adalah Jackids Agent, asisten internal daycare Jackids untuk laporan harian cabang.
 
 ATURAN WAJIB:
 - Bahasa Indonesia singkat dan profesional.

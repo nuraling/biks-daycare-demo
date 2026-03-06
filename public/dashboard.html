@@ -3,27 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard HQ - Biks.AI</title>
+  <title>Dashboard HQ - Jackids</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
     body { background: #F5F0E8; min-height: 100vh; min-height: 100dvh; padding: 0; }
-    .header { background: #1B4332; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+    .header { background: #F5C518; padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
     .header-left { display: flex; align-items: center; gap: 10px; }
-    .header-left a { color: white; text-decoration: none; font-size: 20px; }
-    .header-left h1 { color: white; font-size: 18px; font-weight: 700; }
-    .header-left span { color: #a8d5b5; font-size: 12px; }
+    .header-left a { color: #333; text-decoration: none; font-size: 20px; }
+    .header-left h1 { color: #333; font-size: 18px; font-weight: 700; }
+    .header-left span { color: #7a6a00; font-size: 12px; }
     #branch-filter { padding: 6px 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 13px; font-family: inherit; max-width: 180px; }
     .tabs { display: flex; gap: 0; padding: 12px 16px 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
     .tab-btn { padding: 8px 16px; border: none; background: #e0e0e0; cursor: pointer; font-size: 13px; font-weight: 500; font-family: inherit; border-radius: 8px 8px 0 0; color: #555; white-space: nowrap; flex-shrink: 0; -webkit-tap-highlight-color: transparent; }
-    .tab-btn.active { background: white; color: #1B4332; font-weight: 600; }
+    .tab-btn.active { background: white; color: #E8421E; font-weight: 600; }
     .content { padding: 0 16px 16px; }
     .summary { background: white; padding: 10px 14px; border-radius: 0 8px 0 0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #555; flex-wrap: wrap; gap: 4px; }
-    .summary strong { color: #1B4332; }
+    .summary strong { color: #E8421E; }
     .table-wrap { overflow-x: auto; border-radius: 0 0 12px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: white; -webkit-overflow-scrolling: touch; }
     table { width: 100%; border-collapse: collapse; font-size: 12px; }
-    thead tr { background: #1B4332; color: white; }
+    thead tr { background: #E8421E; color: white; }
     thead th { padding: 8px 10px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
     tbody tr:nth-child(even) { background: #F7FAF7; }
     tbody td { padding: 8px 10px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
@@ -46,7 +46,8 @@
   <div class="header">
     <div class="header-left">
       <a href="/">&larr;</a>
-      <h1>Biks.AI</h1>
+      <img src="/logo.png" alt="Jackids" style="width:32px;height:32px;border-radius:50%;object-fit:cover">
+      <h1>Jackids</h1>
       <span>Dashboard HQ</span>
     </div>
     <select id="branch-filter">
