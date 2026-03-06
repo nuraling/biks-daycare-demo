@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard HQ - Biks.AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #F5F0E8; min-height: 100vh; padding: 0; }
+    .header { background: #1B4332; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+    .header-left { display: flex; align-items: center; gap: 12px; }
+    .header-left h1 { color: white; font-size: 20px; font-weight: 700; }
+    .header-left span { color: #a8d5b5; font-size: 13px; }
+    #branch-filter { padding: 8px 12px; border-radius: 8px; border: 1px solid #ccc; font-size: 13px; font-family: inherit; }
+    .tabs { display: flex; gap: 0; padding: 16px 24px 0; }
+    .tab-btn { padding: 10px 20px; border: none; background: #e0e0e0; cursor: pointer; font-size: 14px; font-weight: 500; font-family: inherit; border-radius: 8px 8px 0 0; color: #555; }
+    .tab-btn.active { background: white; color: #1B4332; font-weight: 600; }
+    .content { padding: 0 24px 24px; }
+    .summary { background: white; padding: 14px 20px; border-radius: 0 8px 0 0; display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: #555; }
+    .summary strong { color: #1B4332; }
+    .table-wrap { overflow-x: auto; border-radius: 0 0 12px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: white; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead tr { background: #1B4332; color: white; }
+    thead th { padding: 10px 14px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    tbody tr:nth-child(even) { background: #F7FAF7; }
+    tbody td { padding: 10px 14px; border-bottom: 1px solid #f0f0f0; white-space: nowrap; }
+    .new-row { animation: highlight 2.5s ease-out forwards; }
+    @keyframes highlight { 0% { background-color: #FFFDE7; } 100% { background-color: transparent; } }
+    .empty-state { text-align: center; padding: 60px 20px; background: white; border-radius: 0 0 12px 12px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="header-left">
+      <h1>Biks.AI</h1>
+      <span>Dashboard HQ</span>
+    </div>
+    <select id="branch-filter">
+      <option value="">Semua Cabang</option>
+      <option value="Kalideres">Kalideres</option>
+      <option value="Jakarta Selatan">Jakarta Selatan</option>
+    </select>
+  </div>
+
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="registrasi">&#x1F4CB; Registrasi Anak</button>
+    <button class="tab-btn" data-tab="laporan">&#x1F4CA; Laporan Harian</button>
+  </div>
+
+  <div class="content">
+    <div class="summary">
+      <span>Total: <strong id="total-count">0</strong> entri</span>
+      <span>&#x1F504; Update terakhir: <span id="last-update">--:--:--</span></span>
+    </div>
+    <div id="table-container"></div>
+  </div>
+
+  <script>
+    let activeTab = 'registrasi';
+    let dataStore = { registrasi: [], laporan: [] };
+    let lastCounts = { registrasi: 0, laporan: 0 };
+
+    const TABS = {
+      registrasi: {
+        endpoint: '/api/dashboard/registrasi',
+        columns: [
+          { display: 'Timestamp', key: 'Timestamp' },
+          { display: 'Cabang', key: 'Cabang' },
+          { display: 'Nama Anak', key: 'Nama Anak' },
+          { display: 'Tgl Lahir', key: 'Tanggal Lahir' },
+          { display: 'Nama Ortu', key: 'Nama Ortu' },
+          { display: 'No. Darurat', key: 'No Darurat' },
+          { display: 'Jam Antar', key: 'Jam Antar' },
+          { display: 'Jam Jemput', key: 'Jam Jemput' },
+        ]
+      },
+      laporan: {
+        endpoint: '/api/dashboard/laporan',
+        columns: [
+          { display: 'Timestamp', key: 'Timestamp' },
+          { display: 'Cabang', key: 'Cabang' },
+          { display: 'Hadir', key: 'Jumlah Hadir' },
+          { display: 'Izin', key: 'Jumlah Izin' },
+          { display: 'Kejadian', key: 'Kejadian' },
+          { display: 'Catatan', key: 'Catatan' },
+          { display: 'Dilaporkan Oleh', key: 'Dilaporkan Oleh' },
+        ]
+      }
+    };
+
+    const branchFilter = document.getElementById('branch-filter');
+    const totalCount = document.getElementById('total-count');
+    const lastUpdate = document.getElementById('last-update');
+    const tableContainer = document.getElementById('table-container');
+
+    // Tab switching
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeTab = btn.dataset.tab;
+        renderTable();
+      });
+    });
+
+    branchFilter.addEventListener('change', renderTable);
+
+    function getFilteredRows() {
+      const branch = branchFilter.value;
+      let rows = dataStore[activeTab] || [];
+      if (branch) {
+        rows = rows.filter(r => r['Cabang'] === branch);
+      }
+      return rows;
+    }
+
+    function renderTable() {
+      const rows = getFilteredRows();
+      const config = TABS[activeTab];
+      totalCount.textContent = rows.length;
+
+      if (rows.length === 0) {
+        tableContainer.innerHTML = `
+          <div class="empty-state">
+            <div style="font-size:48px;margin-bottom:12px">&#x1F4ED;</div>
+            <p style="font-weight:600;color:#444">Belum ada data</p>
+            <p style="color:#888;font-size:13px;margin-top:4px">Mulai simulasi dari halaman Orang Tua atau Staff.</p>
+          </div>`;
+        return;
+      }
+
+      const prevCount = lastCounts[activeTab];
+      let html = '<div class="table-wrap"><table><thead><tr>';
+      config.columns.forEach(c => { html += `<th>${c.display}</th>`; });
+      html += '</tr></thead><tbody>';
+
+      rows.forEach((row, i) => {
+        const isNew = i >= prevCount;
+        html += `<tr class="${isNew ? 'new-row' : ''}">`;
+        config.columns.forEach(c => {
+          let val = row[c.key] || '';
+          if (c.key === 'Timestamp' && val) {
+            try {
+              const d = new Date(val);
+              val = d.toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'medium' });
+            } catch (e) {}
+          }
+          html += `<td>${val}</td>`;
+        });
+        html += '</tr>';
+      });
+
+      html += '</tbody></table></div>';
+      tableContainer.innerHTML = html;
+    }
+
+    async function poll() {
+      if (document.hidden) return;
+
+      try {
+        const [regRes, lapRes] = await Promise.all([
+          fetch('/api/dashboard/registrasi').then(r => r.json()),
+          fetch('/api/dashboard/laporan').then(r => r.json()),
+        ]);
+
+        dataStore.registrasi = regRes.rows || [];
+        dataStore.laporan = lapRes.rows || [];
+
+        renderTable();
+
+        lastCounts.registrasi = dataStore.registrasi.length;
+        lastCounts.laporan = dataStore.laporan.length;
+
+        const now = new Date();
+        lastUpdate.textContent = now.getHours().toString().padStart(2, '0') + ':' +
+          now.getMinutes().toString().padStart(2, '0') + ':' +
+          now.getSeconds().toString().padStart(2, '0');
+      } catch (err) {
+        console.error('Poll error:', err);
+      }
+    }
+
+    // Initial load + polling
+    poll();
+    setInterval(poll, 8000);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) poll(); });
+  </script>
+</body>
+</html>

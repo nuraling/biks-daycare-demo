@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biks Agent</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>* { font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; margin: 0; padding: 0; }</style>
+</head>
+<body>
+  <div id="app">
+    <div id="chat-header">
+      <div id="header-avatar">B</div>
+      <div id="header-info">
+        <div id="header-name"></div>
+        <div id="header-status">Online</div>
+      </div>
+      <div id="header-icons">&#x1F4F9; &#x1F4DE; &#x22EE;</div>
+    </div>
+
+    <div id="chat-area"></div>
+
+    <div id="success-banner" style="display:none">&#x2705; Data berhasil disimpan!</div>
+
+    <div id="input-bar">
+      <span id="emoji-icon">&#x1F60A;</span>
+      <input id="chat-input" type="text" placeholder="Ketik pesan..." autocomplete="off">
+      <button id="send-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+          <path d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <script src="/chat.js"></script>
+  <script>
+    initChat({ endpoint: '/api/chat/parent', agentName: 'Biks Agent \u2013 Pendaftaran' });
+  </script>
+</body>
+</html>
