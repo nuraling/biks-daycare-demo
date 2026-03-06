@@ -1,19 +1,28 @@
 const { google } = require('googleapis');
 
-const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
-
-const auth = new google.auth.GoogleAuth({
-  credentials,
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-});
-
-const sheets = google.sheets({ version: 'v4', auth });
-const SPREADSHEET_ID = process.env.GOOGLE_SHEET_ID;
+function getClient() {
+  if (!process.env.GOOGLE_SERVICE_ACCOUNT_JSON) {
+    throw new Error('GOOGLE_SERVICE_ACCOUNT_JSON is not set');
+  }
+  if (!process.env.GOOGLE_SHEET_ID) {
+    throw new Error('GOOGLE_SHEET_ID is not set');
+  }
+  const credentials = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT_JSON);
+  const auth = new google.auth.GoogleAuth({
+    credentials,
+    scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+  });
+  return {
+    sheets: google.sheets({ version: 'v4', auth }),
+    spreadsheetId: process.env.GOOGLE_SHEET_ID,
+  };
+}
 
 async function appendRow(tabName, rowArray) {
+  const { sheets, spreadsheetId } = getClient();
   const values = [[new Date().toISOString(), ...rowArray]];
   await sheets.spreadsheets.values.append({
-    spreadsheetId: SPREADSHEET_ID,
+    spreadsheetId,
     range: `${tabName}!A:A`,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values },
@@ -21,8 +30,9 @@ async function appendRow(tabName, rowArray) {
 }
 
 async function getRows(tabName) {
+  const { sheets, spreadsheetId } = getClient();
   const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: SPREADSHEET_ID,
+    spreadsheetId,
     range: `${tabName}!A1:Z`,
   });
   const rows = res.data.values;
